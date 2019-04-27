@@ -15,5 +15,11 @@ To run the project:
 3- run all code cells in sequence
 NOTE: it is recommended to set the train_flag vairable to False in order to avoid training
 new CNN models. A CNN model pretrained is already provided in the saved_models/best_model.h5.
+and saved_models/cohn_model.h5
 setting this variable to true will train new CNN models and will overwrite the model
 saved in the target location.
+
+The JAFFE dataset can be downloaded from the following link:
+http://www.kasrl.org/jaffe.html
+the extended cohn-kanade can be downlaoded from the following link:
+http://www.consortium.ri.cmu.edu/ckagree/
