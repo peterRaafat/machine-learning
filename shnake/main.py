@@ -6,7 +6,7 @@ def main():
     shnake = Env()
     player = Player()
     player.start()
-    scheduler = Scheduler([shnake.step], [1])
+    scheduler = Scheduler([shnake.step], [shnake.get_refresh_rate()/1000])
     scheduler.run()
     while True:
         action = player.get_action()
