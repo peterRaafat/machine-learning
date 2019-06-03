@@ -36,6 +36,7 @@ class Env:
         random_column = random.randint(1, self.dimensions - 1)
         self.grid[random_row][random_column] = 1
         self.apple_loc = [random_column, random_column]
+        self.apple_eaten = False
         # initialize zero score
         self.score = 0
         # initialize maximum number of moves
@@ -45,7 +46,11 @@ class Env:
         self.snake_heading = [0, 1, 0, 0]
         self.snake_body = [[0, 0], [0, 1], [0, 2], [1, 2], [1, 3], [1, 4]]
         # manage time
-        self.refresh_rate = 500  # ms
+        self.refresh_rate = 200  # ms
+
+
+    def get_refresh_rate(self):
+        return self.refresh_rate
 
     def step(self):
         """
@@ -65,13 +70,15 @@ class Env:
         # check if you are changing direction in direction not opposite to the heading
         # update snake body
         self.update_snake()
-
+        # update apple location
+        self.update_apple_loc()
+        #delete snake tail if apple was eaten
+        self.delete_tail()
         # update done
         self.update_done()
-        
         # update grid
         self.update_grid()
-        # update score
+
         # update moves left
         return state, score, done
 
@@ -101,8 +108,6 @@ class Env:
             # decrement the column value of the last index of snake body (head)
             head[1] -= 1
             snake_body.append(head)
-        # delete tail
-        del snake_body[0]
         self.snake_body = snake_body
 
     def update_grid(self):
@@ -114,6 +119,8 @@ class Env:
         # insert -1 at snake locations
         for index in self.snake_body:
             self.grid[index[0], index[1]] = -1
+        # insert 1 at apple location
+        self.grid[self.apple_loc[0], self.apple_loc[1]] = 1
 
     def update_done(self):
 
@@ -143,3 +150,38 @@ class Env:
                 pass
             else:
                 self.snake_heading = action
+
+    def update_apple_loc(self):
+        """
+        update the apple location and score in case apple was eaten
+        :return:
+        """
+        if self.snake_body[-1] == self.apple_loc:
+            # increment score
+            self.score += 1
+            # update apple location
+            # avoid getting apple location at snake location
+            grid = np.zeros((self.dimensions, self.dimensions))
+            available_spots = []
+            for i, row in enumerate(grid):
+                for j, column in enumerate(row):
+                    if list([i, j]) not in self.snake_body:
+                        available_spots.append([i, j])
+
+            random_loc = random.sample(available_spots, k=1)
+            self.apple_loc = [random_loc[0][0], random_loc[0][1]]
+            # change the eaten flag to true to increase length of snake body
+            self.apple_eaten = True
+
+    def delete_tail(self):
+        # delete tail if no apple was eaten
+        if self.apple_eaten == False:
+            del self.snake_body[0]
+        else:
+            # reset the flag if apple was eaten
+            self.apple_eaten = False
+
+if __name__ == '__main__':
+    shnake = Env()
+    while True:
+        shnake.step()
