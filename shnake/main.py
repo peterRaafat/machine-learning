@@ -1,14 +1,14 @@
 from env import Env
 from player import Player
-from scheduler import Scheduler
+from timing import RepeatedTimer
+from gui import GUI
 
 def main():
     shnake = Env()
-    player = Player()
+    player = Player(shnake)
     player.start()
-    scheduler = Scheduler([shnake.step], [shnake.get_refresh_rate()/1000])
-    scheduler.run()
-    while True:
-        action = player.get_action()
-        shnake.act(action)
+    rt1 = RepeatedTimer((shnake.refresh_rate/1000), shnake.step)
+    window = GUI(shnake)
+    window.run()
+
 main()

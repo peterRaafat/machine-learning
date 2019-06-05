@@ -1,11 +1,12 @@
 from pynput.keyboard import Listener
+from env import Env
 
 
 class Player:
     """
     This class handles the input from the user
     """
-    def __init__(self):
+    def __init__(self, env):
         """
         initialize class parameters
         """
@@ -13,6 +14,7 @@ class Player:
         self.action = None
         # run keyboard listener
         self.listener = Listener(on_press= self.set_action)
+        self.env = env
 
     def start(self):
         self.listener.start()
@@ -30,6 +32,4 @@ class Player:
             self.action = [0,0,1,0]
         elif key == key.left:
             self.action = [0,0,0,1]
-
-    def get_action(self):
-        return self.action
+        self.env.act(self.action)

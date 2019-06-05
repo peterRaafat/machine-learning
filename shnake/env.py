@@ -1,6 +1,5 @@
 import numpy as np
 import random
-from time import sleep
 
 
 class Env:
@@ -27,7 +26,7 @@ class Env:
         snake_body  :  2d list of int
             indices where the snake body is
         """
-        self.dimensions = 50
+        self.dimensions = 30
         self.grid = np.zeros((self.dimensions, self.dimensions))
         # initialize snake to be at top left
         self.grid[0][0] = -1
@@ -44,9 +43,11 @@ class Env:
         self.done = False
         # initialize snake body and direction to right
         self.snake_heading = [0, 1, 0, 0]
-        self.snake_body = [[0, 0], [0, 1], [0, 2], [1, 2], [1, 3], [1, 4]]
+        self.snake_body = [[0, 0], [0, 1]]
         # manage time
-        self.refresh_rate = 200  # ms
+        self.update_apple_loc()  # remove later
+        self.update_grid() # remove later
+        self.refresh_rate = 300  # ms
 
 
     def get_refresh_rate(self):
@@ -62,22 +63,25 @@ class Env:
         score   :   int
         done    :   boolean
         """
-        print("heading: {}". format(self.snake_heading))
         state = [self.grid, self.snake_heading]
         score = self.score
         done = self.done
-        # update heading
-        # check if you are changing direction in direction not opposite to the heading
-        # update snake body
-        self.update_snake()
-        # update apple location
-        self.update_apple_loc()
-        #delete snake tail if apple was eaten
-        self.delete_tail()
-        # update done
-        self.update_done()
-        # update grid
-        self.update_grid()
+        if self.done:
+            print("game over")
+        else:
+            print("heading: {}". format(self.snake_heading))
+            # update heading
+            # check if you are changing direction in direction not opposite to the heading
+            # update snake body
+            self.update_snake()
+            # update done
+            self.update_done()
+            # update apple location
+            self.update_apple_loc()
+            #delete snake tail if apple was eaten
+            self.delete_tail()
+            # update grid
+            self.update_grid()
 
         # update moves left
         return state, score, done
@@ -89,6 +93,7 @@ class Env:
         heading :   list of int
         :return:
         """
+
         snake_body = self.snake_body[:]
         head = snake_body[-1][:]
         #check heading
@@ -115,12 +120,13 @@ class Env:
         change values of grid depending on snake and apple location
         :return:
         """
-        self.grid = np.zeros((self.dimensions, self.dimensions))
-        # insert -1 at snake locations
-        for index in self.snake_body:
-            self.grid[index[0], index[1]] = -1
-        # insert 1 at apple location
-        self.grid[self.apple_loc[0], self.apple_loc[1]] = 1
+        if not self.done:
+            self.grid = np.zeros((self.dimensions, self.dimensions))
+            # insert -1 at snake locations
+            for index in self.snake_body:
+                self.grid[index[0], index[1]] = -1
+            # insert 1 at apple location
+            self.grid[self.apple_loc[0], self.apple_loc[1]] = 1
 
     def update_done(self):
 
@@ -156,6 +162,7 @@ class Env:
         update the apple location and score in case apple was eaten
         :return:
         """
+        print(len(self.snake_body))
         if self.snake_body[-1] == self.apple_loc:
             # increment score
             self.score += 1
